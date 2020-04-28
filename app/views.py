@@ -5,8 +5,11 @@ Werkzeug Documentation:  http://werkzeug.pocoo.org/documentation/
 This file creates your application.
 """
 
+import os
 from app import app
-from flask import render_template, request
+from flask import render_template, request, jsonify 
+from .forms import UploadForm
+from werkzeug.utils import secure_filename
 
 ###
 # Routing for your application.
@@ -14,6 +17,20 @@ from flask import render_template, request
 
 
 # Please create all new routes and view functions above this route.
+@app.route('/api/upload', methods=['POST'])
+def upload():
+    Upload=UploadForm()
+    if request.method == 'POST' and Upload.validate_on_submit():
+        description = Upload.description.data
+        file = Upload.file.data
+        filename = secure_filename(file.filename)
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+        return jsonify({'message': 'File upload successful', 'filename': file, 'description': description})
+    else:
+        return jsonify({'errors':form_errors(Upload)})
+
+
+
 # This route is now our catch all route for our VueJS single page
 # application.
 @app.route('/', defaults={'path': ''})
