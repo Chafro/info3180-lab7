@@ -1,4 +1,66 @@
 /* Add your Application JavaScript */
+const Uploadform=Vue.component('upload-form', {
+    template: `
+        <div class=upload>
+        <h1>Upload</h1>
+        <ul class="list">
+            <li v-for="message in messages"class="list">
+                {{message.message}}
+                {{message.filename}}
+            </li>
+            <li v-for="error in error"class="list">
+                {{error.error[0]}} <br>
+                {{error.error[1]}}
+            </li>
+        </ul>
+        <form id="uploadform"  @submit.prevent="uploadPhoto" method="POST" enctype="multipart/form-data">
+            <label for="desc">Description:</label>
+            <br>
+            <textarea class="form-control" rows="3" id="desc" name="description"></textarea>
+            <br><br>
+            <input class="form-control-file" type="file"  name="upload"/>
+            <br>
+            <br>
+            <button class="btn btn-primary" type="submit">Upload</button>
+        </form>
+        </div>
+        </div>
+    `,
+    data: function() {
+       return {
+           messages: [],
+           error: []
+       };
+    },
+    methods: {
+        uploadPhoto: function () {
+            let self = this;
+            let uploadForm = document.getElementById('uploadform');
+            let form_data = new FormData(uploadForm);
+            fetch("/api/upload", { 
+                method: 'POST', 
+                body: form_data,
+                headers: {
+                    'X-CSRFToken': token
+                },
+                credentials: 'same-origin'
+            })
+                .then(function (response) {
+                return response.json();
+                })
+                .then(function (jsonResponse) {
+                // display a success message
+                console.log(jsonResponse);
+                self.messages = jsonResponse.messages;
+                self.error = jsonResponse.errors;
+                })
+                .catch(function (error) {
+                console.log(error);
+            });
+        }
+    }
+});
+
 Vue.component('app-header', {
     template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
@@ -11,6 +73,9 @@ Vue.component('app-header', {
         <ul class="navbar-nav mr-auto">
           <li class="nav-item active">
             <router-link class="nav-link" to="/">Home <span class="sr-only">(current)</span></router-link>
+          </li>
+          <li class="nav-item active">
+            <router-link class="nav-link" to="/upload">Upload <span class="sr-only">(current)</span></router-link>
           </li>
         </ul>
       </div>
@@ -57,11 +122,13 @@ const router = new VueRouter({
     routes: [
         {path: "/", component: Home},
         // Put other routes here
-
+        {path: "/upload/", component: Uploadform}
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]
 });
+
+
 
 // Instantiate our main Vue Instance
 let app = new Vue({
