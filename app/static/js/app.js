@@ -4,8 +4,8 @@ const Uploadform=Vue.component('upload-form', {
         <div class=upload>
         <h1>Upload</h1>
         <ul class="list">
-            <div id="successMessage" class="alert alert-success"> Uploaded Image Successfully </div>
-            <div id="terrorMessage" class="alert alert-danger"> Empty Description </div>
+            <div id="successMessage" class="alert alert-success"> Uploaded File Successfully </div>
+            <div id="terrorMessage" class="alert alert-danger"> Description is Empty </div>
             <div id="ferrorMessage" class="alert alert-danger"> No Image Submitted </div>
 
             <li v-for="message in messages"class="list">

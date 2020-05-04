@@ -20,8 +20,6 @@ from werkzeug.utils import secure_filename
 @app.route('/api/upload', methods=['POST'])
 def upload():
     form=UploadForm()
-    print(form.validate_on_submit())
-    print(form.photo.data)
     if form.validate_on_submit():
         description = request.form['description']
         file = request.files['photo']
