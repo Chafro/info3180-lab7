@@ -4,21 +4,26 @@ const Uploadform=Vue.component('upload-form', {
         <div class=upload>
         <h1>Upload</h1>
         <ul class="list">
+            <div id="successMessage" class="alert alert-success"> Uploaded Image Successfully </div>
+            <div id="terrorMessage" class="alert alert-danger"> Empty Description </div>
+            <div id="ferrorMessage" class="alert alert-danger"> No Image Submitted </div>
+
             <li v-for="message in messages"class="list">
                 {{message.message}}
                 {{message.filename}}
             </li>
+            
             <li v-for="error in error"class="list">
                 {{error.error[0]}} <br>
                 {{error.error[1]}}
             </li>
         </ul>
-        <form id="uploadform"  @submit.prevent="uploadPhoto" method="POST" enctype="multipart/form-data">
+        <form id="uploadform"  @submit.prevent="uploadPhoto" method="POST" enctype="multipart/form-data" action="">
             <label for="desc">Description:</label>
             <br>
-            <textarea class="form-control" rows="3" id="desc" name="description"></textarea>
+            <textarea class="form-control" rows="3" id="desc" name="description" id="text"></textarea>
             <br><br>
-            <input class="form-control-file" type="file"  name="upload"/>
+            <input class="form-control-file" type="file"  name="photo" id="file"/>
             <br>
             <br>
             <button class="btn btn-primary" type="submit">Upload</button>
@@ -40,9 +45,7 @@ const Uploadform=Vue.component('upload-form', {
             fetch("/api/upload", { 
                 method: 'POST', 
                 body: form_data,
-                headers: {
-                    'X-CSRFToken': token
-                },
+                headers: {'X-CSRFToken': token},
                 credentials: 'same-origin'
             })
                 .then(function (response) {
@@ -50,11 +53,34 @@ const Uploadform=Vue.component('upload-form', {
                 })
                 .then(function (jsonResponse) {
                 // display a success message
+                if($(file).val() === ""){
+                  $("#ferrorMessage").show();
+                  $("#terrorMessage").hide();
+                  $("#successMessage").hide();
+                }
+
+                if($(text).val() === ""){
+                  $("#terrorMessage").show();
+                  $("#ferrorMessage").hide();
+                  $("#successMessage").hide();
+                }
+
+                if($(file).val() === "" & $(text).val() === ""){
+                  $("#ferrorMessage").show();
+                  $("#terrorMessage").show();
+                  $("#successMessage").hide();
+                }
+
+                if($(text).val() != "" & $(file).val() != ""){
+                  $("#successMessage").show();
+                  $("#ferrorMessage").hide();
+                  $("#terrorMessage").hide();
+                }
+                
                 console.log(jsonResponse);
-                self.messages = jsonResponse.messages;
-                self.error = jsonResponse.errors;
                 })
                 .catch(function (error) {
+                  $("#errorMessage").show();
                 console.log(error);
             });
         }
@@ -122,7 +148,7 @@ const router = new VueRouter({
     routes: [
         {path: "/", component: Home},
         // Put other routes here
-        {path: "/upload/", component: Uploadform}
+        {path: "/upload/", component: Uploadform},
         // This is a catch all route in case none of the above matches
         {path: "*", component: NotFound}
     ]

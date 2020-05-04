@@ -1,3 +1,13 @@
 body {
     padding-top: 5rem;
 }
+#successMessage {
+    display:none;
+}
+#terrorMessage {
+	
+    display:none;
+}
+#ferrorMessage {
+    display:none;
+}
